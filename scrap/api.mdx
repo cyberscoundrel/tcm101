@@ -1,0 +1,83 @@
+# API Documentation
+
+Welcome to our API documentation. Here you'll find detailed information about our API endpoints, authentication, and usage examples.
+
+## Authentication
+
+All API requests require authentication using a Bearer token:
+
+```typescript
+const headers = {
+  'Authorization': 'Bearer YOUR_TOKEN',
+  'Content-Type': 'application/json'
+};
+```
+
+## Endpoints
+
+### Users
+
+#### Get User Profile
+```typescript
+GET /api/users/profile
+
+Response:
+{
+  "id": "string",
+  "email": "string",
+  "verified": boolean
+}
+```
+
+#### Update User
+```typescript
+PUT /api/users/profile
+{
+  "email": "string",
+  "preferences": {
+    "theme": "light" | "dark"
+  }
+}
+```
+
+### Documentation
+
+#### Get Documentation
+```typescript
+GET /api/docs/:slug
+
+Response:
+{
+  "title": "string",
+  "content": "string",
+  "lastUpdated": "string"
+}
+```
+
+## Rate Limiting
+
+- 100 requests per minute
+- 1000 requests per hour
+- 10000 requests per day
+
+## Error Handling
+
+All errors follow this format:
+
+```typescript
+{
+  "error": {
+    "code": "string",
+    "message": "string",
+    "details": object
+  }
+}
+```
+
+Common error codes:
+- `400`: Bad Request
+- `401`: Unauthorized
+- `403`: Forbidden
+- `404`: Not Found
+- `429`: Too Many Requests
+- `500`: Internal Server Error 

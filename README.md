@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Documentation Site with Authentication
 
-## Getting Started
+A Next.js documentation site with email/password authentication, email verification, and add code system.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Email/password authentication
+- Email verification system
+- Add code system for registration
+- Password reset functionality
+- Protected documentation pages
+- MySQL database integration
+- TypeScript support
+- MDX documentation support
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Prerequisites
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Node.js 18+ and npm
+- MySQL database
+- SMTP server for email functionality
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Setup
 
-## Learn More
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Create a `.env` file in the root directory with the following variables:
+   ```
+   DATABASE_URL="mysql://user:password@localhost:3306/docs_site"
+   NEXTAUTH_SECRET="your-secret-key-here"
+   NEXTAUTH_URL="http://localhost:3000"
+   EMAIL_SERVER_HOST="smtp.example.com"
+   EMAIL_SERVER_PORT=587
+   EMAIL_SERVER_USER="your-email@example.com"
+   EMAIL_SERVER_PASSWORD="your-email-password"
+   EMAIL_FROM="noreply@example.com"
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Initialize the database:
+   ```bash
+   npx prisma db push
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Create an add code in the database:
+   ```sql
+   INSERT INTO AddCode (id, code, used) VALUES (UUID(), 'YOUR_ADD_CODE', false);
+   ```
 
-## Deploy on Vercel
+6. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Usage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Visit `http://localhost:3000`
+2. Use the registration page to create a new account
+3. Enter your email to receive a verification code
+4. Use the add code provided to complete registration
+5. Log in with your credentials
+6. Access the protected documentation pages
+
+## Development
+
+- The site uses Next.js 14 with the App Router
+- Authentication is handled by NextAuth.js
+- Database operations use Prisma ORM
+- Styling is done with Tailwind CSS
+- MDX files can be added to the `src/content` directory for documentation
+
+## Security
+
+- Passwords are hashed using bcrypt
+- Email verification is required for account creation
+- Add codes are single-use
+- Sessions are managed securely with NextAuth.js
+- All routes are protected appropriately
+
+## License
+
+MIT
