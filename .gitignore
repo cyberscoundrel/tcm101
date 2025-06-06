@@ -42,4 +42,6 @@ next-env.d.ts
 # Docker image archives
 *.tar
 .tar
-
+# key files
+*.pem
+.pem

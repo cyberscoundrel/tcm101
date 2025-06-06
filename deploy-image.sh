@@ -3,7 +3,7 @@
 # Deploy using pre-built Docker image
 # Usage: ./deploy-image.sh [image-name] [ip-address]
 
-IMAGE_NAME=${1:-"yourusername/docs-app:latest"}
+IMAGE_NAME=${1:-"docs-app/docs-app:latest"}
 CUSTOM_IP=${2}
 
 echo "🚀 Deploying $IMAGE_NAME..."
@@ -100,9 +100,10 @@ EOF
 else
     echo "📝 Updating .env file (preserving existing credentials)..."
     
-    # Update Docker image
+    # Update Docker image - using # as delimiter to handle image names with forward slashes
+    # This is a workaround for a known issue with sed on Windows
     if grep -q "DOCKER_IMAGE=" .env; then
-        sed -i.bak "s|DOCKER_IMAGE=.*|DOCKER_IMAGE=$IMAGE_NAME|" .env
+        sed -i.bak "s#DOCKER_IMAGE=.*#DOCKER_IMAGE=$IMAGE_NAME#" .env
     else
         echo "DOCKER_IMAGE=$IMAGE_NAME" >> .env
     fi
