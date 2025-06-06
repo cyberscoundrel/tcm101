@@ -155,16 +155,20 @@ else
     fi
     
     # Update or add DATABASE_URL to match docker-compose configuration
+    # URL-encode the password for the DATABASE_URL
+    ENCODED_PASSWORD=$(echo "$MYSQL_PASSWORD_VALUE" | sed 's/+/%2B/g; s/\//%2F/g; s/@/%40/g; s/:/%3A/g; s/?/%3F/g; s/#/%23/g; s/\[/%5B/g; s/\]/%5D/g')
+    echo "🔍 Debug: URL-encoded password: $ENCODED_PASSWORD"
+    
     if grep -q "DATABASE_URL=" .env; then
         # Update existing DATABASE_URL
         grep -v "^DATABASE_URL=" .env > .env.tmp
-        echo "DATABASE_URL=mysql://docs_user:${MYSQL_PASSWORD_VALUE}@db:3306/docs_db" >> .env.tmp
+        echo "DATABASE_URL=mysql://docs_user:${ENCODED_PASSWORD}@db:3306/docs_db" >> .env.tmp
         mv .env.tmp .env
         echo "🔗 Updated DATABASE_URL for Docker environment"
     else
         # Add new DATABASE_URL
         echo "" >> .env
-        echo "DATABASE_URL=mysql://docs_user:${MYSQL_PASSWORD_VALUE}@db:3306/docs_db" >> .env
+        echo "DATABASE_URL=mysql://docs_user:${ENCODED_PASSWORD}@db:3306/docs_db" >> .env
         echo "➕ Added DATABASE_URL for Docker environment"
     fi
     
