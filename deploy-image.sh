@@ -119,6 +119,8 @@ else
         echo "🔍 Debug: .env after update:"
         cat .env | head -10
     else
+        # Ensure there's a newline before adding new variables
+        echo "" >> .env
         echo "DOCKER_IMAGE=$IMAGE_NAME" >> .env
         echo "➕ Added DOCKER_IMAGE: $IMAGE_NAME"
         echo "🔍 Debug: .env after adding DOCKER_IMAGE:"
@@ -127,35 +129,50 @@ else
     
     # Update NEXTAUTH_URL with current IP
     if grep -q "NEXTAUTH_URL=" .env; then
-        sed -i.bak "s|NEXTAUTH_URL=.*|NEXTAUTH_URL=http://$PUBLIC_IP:3002|" .env
+        # Use the same robust method for NEXTAUTH_URL
+        grep -v "^NEXTAUTH_URL=" .env > .env.tmp
+        echo "NEXTAUTH_URL=http://$PUBLIC_IP:3002" >> .env.tmp
+        mv .env.tmp .env
         echo "🔗 Updated NEXTAUTH_URL to: http://$PUBLIC_IP:3002"
     else
+        # Ensure there's a newline before adding new variables
+        echo "" >> .env
         echo "NEXTAUTH_URL=http://$PUBLIC_IP:3002" >> .env
     fi
     
     # Only add missing database credentials
     if ! grep -q "MYSQL_ROOT_PASSWORD=" .env; then
+        # Ensure there's a newline before adding new variables
+        echo "" >> .env
         echo "MYSQL_ROOT_PASSWORD=$(openssl rand -base64 32 2>/dev/null || echo "change-this-root-password")" >> .env
         echo "🔐 Generated new MySQL root password"
     fi
     
     if ! grep -q "MYSQL_PASSWORD=" .env; then
+        # Ensure there's a newline before adding new variables
+        echo "" >> .env
         echo "MYSQL_PASSWORD=$(openssl rand -base64 24 2>/dev/null || echo "change-this-password")" >> .env
         echo "🔐 Generated new MySQL user password"
     fi
     
     # Only add missing application credentials
     if ! grep -q "NEXTAUTH_SECRET=" .env; then
+        # Ensure there's a newline before adding new variables
+        echo "" >> .env
         echo "NEXTAUTH_SECRET=$(openssl rand -base64 32 2>/dev/null || echo "change-this-secret-key")" >> .env
         echo "🔐 Generated new NextAuth secret"
     fi
     
     # Only add missing port configuration
     if ! grep -q "APP_PORT=" .env; then
+        # Ensure there's a newline before adding new variables
+        echo "" >> .env
         echo "APP_PORT=3002" >> .env
     fi
     
     if ! grep -q "STUDIO_PORT=" .env; then
+        # Ensure there's a newline before adding new variables
+        echo "" >> .env
         echo "STUDIO_PORT=5556" >> .env
     fi
     
