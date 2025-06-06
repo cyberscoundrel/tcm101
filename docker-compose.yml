@@ -1,0 +1,46 @@
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: docs-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: docs_db
+      MYSQL_USER: docs_user
+      MYSQL_PASSWORD: docs_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - docs-network
+
+  # Next.js Application
+  app:
+    build: .
+    container_name: docs-app
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+      - "5556:5556"
+    environment:
+      DATABASE_URL: mysql://docs_user:docs_password@db:3306/docs_db
+      NEXTAUTH_URL: http://localhost:3002
+      NEXTAUTH_SECRET: your-secret-key-here
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    depends_on:
+      - db
+    volumes:
+      - ./.env.local:/app/.env.local:ro
+    command: sh -c "npx prisma db push && ./start.sh"
+    networks:
+      - docs-network
+
+volumes:
+  mysql_data:
+
+networks:
+  docs-network:
+    driver: bridge 

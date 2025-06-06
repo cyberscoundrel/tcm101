@@ -1,0 +1,31 @@
+# Use Node.js 18 Alpine as base image
+FROM node:18-alpine
+
+# Install git
+RUN apk add --no-cache git
+
+# Set working directory
+WORKDIR /app
+
+# Clone the repository
+ARG REPO_URL=https://github.com/yourusername/centroid-class.git
+ARG BRANCH=main
+RUN git clone --branch ${BRANCH} ${REPO_URL} .
+
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build the application
+RUN npm run build
+
+# Make startup script executable
+RUN chmod +x ./start.sh
+
+# Expose ports for Next.js app and Prisma Studio
+EXPOSE 3000 5556
+
+# Use startup script as entry point
+CMD ["./start.sh"] 
