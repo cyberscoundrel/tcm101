@@ -78,6 +78,10 @@ if [[ "$PUBLIC_IP" != "localhost" && ! $PUBLIC_IP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0
 fi
 
 # Create or update environment file
+echo "🔍 Debug: Current working directory: $(pwd)"
+echo "🔍 Debug: Checking for .env file existence and permissions:"
+ls -la .env 2>/dev/null || echo "  .env file does not exist"
+
 if [ ! -f .env ]; then
     echo "📝 Creating .env file..."
     cat > .env << EOF
@@ -104,13 +108,21 @@ else
     # This is a workaround for a known issue with sed on Windows
     if grep -q "DOCKER_IMAGE=" .env; then
         # Create a temporary file with the updated DOCKER_IMAGE value
+        echo "🔍 Debug: Current .env before update:"
+        cat .env | head -5
         grep -v "^DOCKER_IMAGE=" .env > .env.tmp
         echo "DOCKER_IMAGE=$IMAGE_NAME" >> .env.tmp
+        echo "🔍 Debug: Contents of .env.tmp:"
+        cat .env.tmp | head -10
         mv .env.tmp .env
         echo "🔄 Updated DOCKER_IMAGE to: $IMAGE_NAME"
+        echo "🔍 Debug: .env after update:"
+        cat .env | head -10
     else
         echo "DOCKER_IMAGE=$IMAGE_NAME" >> .env
         echo "➕ Added DOCKER_IMAGE: $IMAGE_NAME"
+        echo "🔍 Debug: .env after adding DOCKER_IMAGE:"
+        cat .env | head -10
     fi
     
     # Update NEXTAUTH_URL with current IP
