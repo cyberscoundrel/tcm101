@@ -103,9 +103,14 @@ else
     # Update Docker image - using # as delimiter to handle image names with forward slashes
     # This is a workaround for a known issue with sed on Windows
     if grep -q "DOCKER_IMAGE=" .env; then
-        sed -i.bak "s#DOCKER_IMAGE=.*#DOCKER_IMAGE=$IMAGE_NAME#" .env
+        # Create a temporary file with the updated DOCKER_IMAGE value
+        grep -v "^DOCKER_IMAGE=" .env > .env.tmp
+        echo "DOCKER_IMAGE=$IMAGE_NAME" >> .env.tmp
+        mv .env.tmp .env
+        echo "🔄 Updated DOCKER_IMAGE to: $IMAGE_NAME"
     else
         echo "DOCKER_IMAGE=$IMAGE_NAME" >> .env
+        echo "➕ Added DOCKER_IMAGE: $IMAGE_NAME"
     fi
     
     # Update NEXTAUTH_URL with current IP
