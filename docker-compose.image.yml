@@ -23,7 +23,7 @@ services:
       - "${APP_PORT:-3002}:3000"
       - "${STUDIO_PORT:-5556}:5556"
     environment:
-      DATABASE_URL: mysql://docs_user:${MYSQL_PASSWORD:-docs_password}@db:3306/docs_db
+      DATABASE_URL: ${DATABASE_URL}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3002}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-your-secret-key-here}
       HOSTNAME: 0.0.0.0
