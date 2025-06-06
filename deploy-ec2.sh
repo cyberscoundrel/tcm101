@@ -4,8 +4,22 @@
 echo "🚀 Starting EC2 deployment..."
 
 # Get EC2 public IP
-EC2_PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
-echo "📍 EC2 Public IP: $EC2_PUBLIC_IP"
+# Check if IP is provided as argument, otherwise get from metadata
+if [ -n "$1" ]; then
+    EC2_PUBLIC_IP="$1"
+    echo "📍 Using provided EC2 Public IP: $EC2_PUBLIC_IP"
+else
+    EC2_PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+    echo "📍 Auto-detected EC2 Public IP: $EC2_PUBLIC_IP"
+fi
+
+# Validate IP format (basic check)
+if [[ ! $EC2_PUBLIC_IP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+    echo "❌ Error: Invalid IP address format: $EC2_PUBLIC_IP"
+    echo "Usage: ./deploy-ec2.sh [IP_ADDRESS]"
+    echo "Example: ./deploy-ec2.sh 54.123.45.67"
+    exit 1
+fi
 
 # Create environment file
 echo "📝 Creating environment configuration..."
