@@ -140,19 +140,40 @@ else
         echo "NEXTAUTH_URL=http://$PUBLIC_IP:3002" >> .env
     fi
     
-    # Only add missing database credentials
+    # Ensure MYSQL_PASSWORD exists before creating DATABASE_URL
+    if ! grep -q "MYSQL_PASSWORD=" .env; then
+        # Generate MYSQL_PASSWORD first if it doesn't exist
+        MYSQL_PASSWORD_VALUE=$(openssl rand -base64 24 2>/dev/null || echo "change-this-password")
+        echo "" >> .env
+        echo "MYSQL_PASSWORD=$MYSQL_PASSWORD_VALUE" >> .env
+        echo "🔐 Generated new MySQL user password"
+        echo "🔍 Debug: Generated MYSQL_PASSWORD: $MYSQL_PASSWORD_VALUE"
+    else
+        # Extract existing password
+        MYSQL_PASSWORD_VALUE=$(grep "MYSQL_PASSWORD=" .env | head -1 | cut -d'=' -f2 | tr -d '"')
+        echo "🔍 Debug: Extracted existing MYSQL_PASSWORD: $MYSQL_PASSWORD_VALUE"
+    fi
+    
+    # Update or add DATABASE_URL to match docker-compose configuration
+    if grep -q "DATABASE_URL=" .env; then
+        # Update existing DATABASE_URL
+        grep -v "^DATABASE_URL=" .env > .env.tmp
+        echo "DATABASE_URL=mysql://docs_user:${MYSQL_PASSWORD_VALUE}@db:3306/docs_db" >> .env.tmp
+        mv .env.tmp .env
+        echo "🔗 Updated DATABASE_URL for Docker environment"
+    else
+        # Add new DATABASE_URL
+        echo "" >> .env
+        echo "DATABASE_URL=mysql://docs_user:${MYSQL_PASSWORD_VALUE}@db:3306/docs_db" >> .env
+        echo "➕ Added DATABASE_URL for Docker environment"
+    fi
+    
+    # Only add missing database credentials (MYSQL_PASSWORD already handled above)
     if ! grep -q "MYSQL_ROOT_PASSWORD=" .env; then
         # Ensure there's a newline before adding new variables
         echo "" >> .env
         echo "MYSQL_ROOT_PASSWORD=$(openssl rand -base64 32 2>/dev/null || echo "change-this-root-password")" >> .env
         echo "🔐 Generated new MySQL root password"
-    fi
-    
-    if ! grep -q "MYSQL_PASSWORD=" .env; then
-        # Ensure there's a newline before adding new variables
-        echo "" >> .env
-        echo "MYSQL_PASSWORD=$(openssl rand -base64 24 2>/dev/null || echo "change-this-password")" >> .env
-        echo "🔐 Generated new MySQL user password"
     fi
     
     # Only add missing application credentials
